@@ -12,7 +12,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "fieldCell",
+    "_name": "fieldCellVerticalSide",
     "_objFlags": 0,
     "_parent": null,
     "_children": [],
@@ -69,13 +69,13 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 40,
-      "height": 50
+      "width": 120,
+      "height": 80
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
-      "x": 0,
-      "y": 1
+      "x": 0.5,
+      "y": 0.5
     },
     "_id": ""
   },
@@ -106,7 +106,7 @@
       "a": 255
     },
     "_spriteFrame": {
-      "__uuid__": "d39a8efe-e161-40a9-894f-fd6389cd6e03@dbec7",
+      "__uuid__": "d39a8efe-e161-40a9-894f-fd6389cd6e03@4d90b",
       "__expectedType__": "cc.SpriteFrame"
     },
     "_type": 0,

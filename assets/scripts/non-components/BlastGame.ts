@@ -22,12 +22,12 @@ export class BlastGame {
         this.minCombinationCount = minCombinationCount;
 
         this.tiles = new Array<Array<number>>(height);
-        this.tiles.forEach(row =>{
-            row = new Array<number>(width);
-            row.forEach(tile => {
-                tile = this.getRandomTile();
-            });
-        });
+        for(let row = 0; row < height; row++){
+            this.tiles[row] = new Array(width);
+            for (let col = 0; col < width; col++) {
+                this.tiles[row][col] =  this.getRandomTile();        
+            }
+        }
 
 
     }
