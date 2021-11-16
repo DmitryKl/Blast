@@ -211,15 +211,12 @@
     "__type__": "ffa288XZ4tO4JZ1HDnVh7wC",
     "_name": "",
     "_objFlags": 0,
+    "__editorExtras__": {},
     "node": {
       "__id__": 1
     },
     "_enabled": true,
     "__prefab": null,
-    "explosionPrefab": {
-      "__uuid__": "1e683b5f-1f53-4bf8-a4e1-e960460b949f",
-      "__expectedType__": "cc.Prefab"
-    },
     "_id": ""
   },
   {
