@@ -1,9 +1,7 @@
-
 import { _decorator, Component, Node, SpriteFrame, Sprite, Prefab, Vec2, Size } from 'cc';
 import * as modules from 'cc';
-import { BlastGame } from './non-components/BlastGame';
+import { BlastGame, GameResult } from './non-components/BlastGame';
 import { Position, Utils } from "./non-components/Utils";
-import { Tile } from "./non-components/Tile";
 import { TileComponent } from './TileComponent';
 
 const { ccclass, property } = _decorator;
@@ -37,7 +35,7 @@ export class GameManager extends Component {
     @property({ type: Prefab })
     removePSPrefab: Prefab = null;
 
-    tiles: Tile[][];
+    tiles: TileComponent[][];
 
     tileSize: Size;
     tileStartPoint: Vec2;
@@ -66,20 +64,37 @@ export class GameManager extends Component {
             removePS.setPosition(this.tiles[tilePosition.row][tilePosition.column].node.position);
 
             this.tiles[tilePosition.row][tilePosition.column].node.destroy();
-            this.tiles[tilePosition.row][tilePosition.column].node = null;
+            this.tiles[tilePosition.row][tilePosition.column] = null;
         };
 
         this.game.fallTileEvent = (tilePosition: Position) => {
-            this.tiles[tilePosition.row - 1][tilePosition.column].node = this.tiles[tilePosition.row][tilePosition.column].node;
-            this.tiles[tilePosition.row - 1][tilePosition.column].node.getComponent(TileComponent).tile = this.tiles[tilePosition.row - 1][tilePosition.column];
-            this.tiles[tilePosition.row][tilePosition.column].node = null;
+            this.tiles[tilePosition.row - 1][tilePosition.column] = this.tiles[tilePosition.row][tilePosition.column];
+            this.tiles[tilePosition.row - 1][tilePosition.column].getComponent(TileComponent).tilePosition = new Position(tilePosition.row - 1, tilePosition.column);
+            this.tiles[tilePosition.row][tilePosition.column] = null;
         };
 
-        this.game.createTileEvent = (tilePosition: Position, tileType: number) => {
-            this.tiles[tilePosition.row][tilePosition.column].type = tileType;
+        this.game.tilesFallenEvent = () => {
+            this.fillTileNodes();
         };
 
-        this.game.stateChangedEvent = this.fillTileNodes.bind(this);
+        this.game.tilesSwappedEvent = () => {            
+            modules.tween(this)
+            .delay(1)
+            .call(() => {
+                for (let row = 0; row < this.height; row++) {
+                    for (let column = 0; column < this.width; column++) {
+                        this.tiles[row][column].node.destroy();
+                        this.tiles[row][column] = null;
+                    }
+                }
+            })
+            .call(() => {this.fillTileNodes()})
+            .start();
+        };
+
+        this.game.gameOverEvent = (result: GameResult) => {
+            modules.log("Вы проиграли!");
+        }
     }
 
     private calculateSizes() {
@@ -90,7 +105,7 @@ export class GameManager extends Component {
 
         this.tileStartPoint = new Vec2(
             - this.tileSize.width * (this.width - 1) / 2,
-            this.tileSize.height * this.height / 2
+            - this.tileSize.height * this.height / 2
         );
 
         this.tilePrefab.data.getComponent(modules.UITransform).contentSize = new Size(
@@ -108,13 +123,7 @@ export class GameManager extends Component {
     }
 
     private initTiles() {
-        this.tiles = new Array<Array<Tile>>(this.height);
-        for (let row = 0; row < this.height; row++) {
-            this.tiles[row] = new Array<Tile>(this.width);
-            for (let column = 0; column < this.width; column++) {
-                this.tiles[row][column] = new Tile(new Position(row, column), this.game.tiles[row][column]);
-            }
-        }
+        this.tiles = Utils.init2dArray(this.height, this.width);
     }
 
     private fillTileNodes() {
@@ -122,12 +131,12 @@ export class GameManager extends Component {
 
         for (let row = 0; row < this.height; row++) {
             for (let column = 0; column < this.width; column++) {
-                if (this.tiles[row][column].node == null) {
-                    this.tiles[row][column].node = this.createTileNode(
-                        this.tiles[row][column],
+                if (this.tiles[row][column] == null) {
+                    this.tiles[row][column] = this.createTileNode(
+                        new Position(row, column),
                         new Vec2(
                             this.tileStartPoint.x + column * this.tileSize.width,
-                            this.tileStartPoint.y + offsetsY[column]
+                            this.tileStartPoint.y + this.tileSize.height * this.height + offsetsY[column]
                         )
                     );
                     offsetsY[column] += this.tileSize.height;
@@ -136,13 +145,13 @@ export class GameManager extends Component {
         }
     }
 
-    private createTileNode(tile: Tile, position: Vec2): Node {
-        let newNode: Node = modules.instantiate(this.tilePrefab);     
-        this.field.addChild(newNode);
-        newNode.setPosition(position.x, position.y);
-        newNode.getComponent(Sprite).spriteFrame = this.tileSpriteFrames[this.tiles[tile.position.row][tile.position.column].type];        
-                
-        newNode.getComponent(TileComponent).tile = tile;
+    private createTileNode(tilePosition: Position, position: Vec2): TileComponent {
+        let newNode: TileComponent = modules.instantiate(this.tilePrefab).getComponent(TileComponent);
+        this.field.addChild(newNode.node);
+        newNode.node.setPosition(position.x, position.y);
+        newNode.getComponent(Sprite).spriteFrame = this.tileSpriteFrames[this.game.tiles[tilePosition.row][tilePosition.column]];
+
+        newNode.getComponent(TileComponent).tilePosition = tilePosition;
         newNode.getComponent(TileComponent).game = this.game;
 
         return newNode;

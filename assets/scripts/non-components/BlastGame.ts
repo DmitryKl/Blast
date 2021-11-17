@@ -1,5 +1,10 @@
 import { Position, Utils } from "./Utils";
 
+export enum GameResult {
+    Win,
+    Loose
+}
+
 export class BlastGame {
     readonly height: number;
     readonly width: number;
@@ -11,8 +16,9 @@ export class BlastGame {
 
     removeTileEvent: (position: Position) => void;
     fallTileEvent: (position: Position) => void;
-    createTileEvent: (position: Position, type: number) => void;
-    stateChangedEvent: () => void;
+    tilesFallenEvent: () => void;
+    tilesSwappedEvent: () => void;
+    gameOverEvent: (result: GameResult) => void;
 
     constructor(
         height: number,
@@ -44,8 +50,9 @@ export class BlastGame {
         if (combination.length >= this.minCombinationCount) {
             this.removeTiles(combination);
             this.fallTiles();
-            this.filleEmptyTiles();
-            this.stateChangedEvent();
+            this.filleEmptyTiles();            
+            this.tilesFallenEvent();
+            this.reshuffleIfNeed();
         }
     }
 
@@ -100,7 +107,6 @@ export class BlastGame {
             for (let column = 0; column < this.width; column++) {
                 if (this.tiles[row][column] === null) {
                     this.tiles[row][column] = this.getRandomTile();
-                    this.createTileEvent(new Position(row, column), this.tiles[row][column]);
                 }
             }
         }
@@ -122,12 +128,74 @@ export class BlastGame {
         }
     }
 
-    private fallTile(tilePosition: Position) {
-        if (tilePosition.row > 0) {
-            this.tiles[tilePosition.row - 1][tilePosition.column] = this.tiles[tilePosition.row][tilePosition.column];
-            this.tiles[tilePosition.row][tilePosition.column] = null;
-            this.fallTileEvent(tilePosition);
+    private fallTile(tile: Position) {
+        this.tiles[tile.row - 1][tile.column] = this.tiles[tile.row][tile.column];
+        this.tiles[tile.row][tile.column] = null;
+        this.fallTileEvent(tile);
+    }
+
+    private reshuffleIfNeed() {
+        let reshuffleIteration = 0;
+        let moveExists = this.moveExists();
+
+        while (!moveExists && reshuffleIteration < this.maxReshuffleCount) {
+            this.reshuffle();
+            reshuffleIteration++;
+            moveExists = this.moveExists();
+        }
+
+        if (!moveExists && reshuffleIteration == this.maxReshuffleCount) {
+            this.gameOverEvent(GameResult.Loose);
+        }
+
+        if (reshuffleIteration > 0) {
+            this.tilesSwappedEvent();
         }
     }
 
+    private reshuffle() {
+        let positions: Position[] = [];
+
+        for (let row = 0; row < this.height; row++) {
+            for (let column = 0; column < this.width; column++) {
+                positions.push(new Position(row, column));
+            }
+        }
+
+        while (positions.length > 1) {
+            let firstPosition = positions.pop();
+            let secondPostionIndex = Math.floor(Math.random() * positions.length);
+            let secondPosition = positions[secondPostionIndex];
+            this.swapTiles(firstPosition, secondPosition);
+            positions.splice(secondPostionIndex, 1)
+        }
+    }
+
+    private swapTiles(tile1: Position, tile2: Position) {
+        let tmp = this.tiles[tile1.row][tile1.column];
+        this.tiles[tile1.row][tile1.column] = this.tiles[tile2.row][tile2.column];
+        this.tiles[tile2.row][tile2.column] = tmp;
+    }
+
+    private moveExists(): boolean {
+        let checkedTiles = Utils.init2dArray(this.height, this.width, false);
+
+        for (let row = 0; row < this.height; row++) {
+            for (let column = 0; column < this.width; column++) {
+                if (!checkedTiles[row][column]) {
+                    let combination = this.getCombination(new Position(row, column));
+
+                    if (combination.length >= this.minCombinationCount) {
+                        return true;
+                    } else {
+                        combination.forEach(position => {
+                            checkedTiles[position.row][position.column] = true;
+                        });
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
 }
