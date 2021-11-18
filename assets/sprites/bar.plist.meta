@@ -1,0 +1,120 @@
+{
+  "ver": "1.0.6",
+  "importer": "sprite-atlas",
+  "imported": true,
+  "uuid": "9b054e5e-639b-4f54-ba91-57c0bf6660f2",
+  "files": [
+    ".plist",
+    ".json"
+  ],
+  "subMetas": {
+    "057d2": {
+      "importer": "sprite-frame",
+      "uuid": "9b054e5e-639b-4f54-ba91-57c0bf6660f2@057d2",
+      "displayName": "",
+      "id": "057d2",
+      "name": "Layer 2",
+      "userData": {
+        "trimType": "auto",
+        "trimThreshold": 1,
+        "rotated": false,
+        "offsetX": 0,
+        "offsetY": 0,
+        "trimX": 0,
+        "trimY": 0,
+        "width": 45,
+        "height": 86,
+        "rawWidth": 45,
+        "rawHeight": 86,
+        "borderTop": 0,
+        "borderBottom": 0,
+        "borderLeft": 0,
+        "borderRight": 0,
+        "packable": true,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "81663f0e-3ea0-4fec-9780-ffd9885c4630@6c48a",
+        "atlasUuid": "9b054e5e-639b-4f54-ba91-57c0bf6660f2"
+      },
+      "ver": "1.0.9",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "74c18": {
+      "importer": "sprite-frame",
+      "uuid": "9b054e5e-639b-4f54-ba91-57c0bf6660f2@74c18",
+      "displayName": "",
+      "id": "74c18",
+      "name": "Layer 4",
+      "userData": {
+        "trimType": "auto",
+        "trimThreshold": 1,
+        "rotated": false,
+        "offsetX": 0,
+        "offsetY": 0,
+        "trimX": 45,
+        "trimY": 0,
+        "width": 45,
+        "height": 86,
+        "rawWidth": 45,
+        "rawHeight": 86,
+        "borderTop": 0,
+        "borderBottom": 0,
+        "borderLeft": 0,
+        "borderRight": 0,
+        "packable": true,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "81663f0e-3ea0-4fec-9780-ffd9885c4630@6c48a",
+        "atlasUuid": "9b054e5e-639b-4f54-ba91-57c0bf6660f2"
+      },
+      "ver": "1.0.9",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "0325e": {
+      "importer": "sprite-frame",
+      "uuid": "9b054e5e-639b-4f54-ba91-57c0bf6660f2@0325e",
+      "displayName": "",
+      "id": "0325e",
+      "name": "Layer 5",
+      "userData": {
+        "trimType": "auto",
+        "trimThreshold": 1,
+        "rotated": false,
+        "offsetX": 0,
+        "offsetY": 0,
+        "trimX": 90,
+        "trimY": 0,
+        "width": 60,
+        "height": 86,
+        "rawWidth": 60,
+        "rawHeight": 86,
+        "borderTop": 0,
+        "borderBottom": 0,
+        "borderLeft": 0,
+        "borderRight": 0,
+        "packable": true,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "81663f0e-3ea0-4fec-9780-ffd9885c4630@6c48a",
+        "atlasUuid": "9b054e5e-639b-4f54-ba91-57c0bf6660f2"
+      },
+      "ver": "1.0.9",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "atlasTextureName": "bar.png",
+    "format": 3,
+    "uuid": "9b054e5e-639b-4f54-ba91-57c0bf6660f2",
+    "textureUuid": "81663f0e-3ea0-4fec-9780-ffd9885c4630@6c48a"
+  }
+}

@@ -13,6 +13,9 @@ export class BlastGame {
     readonly minCombinationCount: number;
 
     tiles: number[][];
+    score: number = 0;
+    readonly scoreGoal: number;
+    moves: number;
 
     removeTileEvent: (position: Position) => void;
     fallTileEvent: (position: Position) => void;
@@ -25,12 +28,17 @@ export class BlastGame {
         width: number,
         colorsCount: number,
         maxReshuffleCount: number,
-        minCombinationCount: number) {
+        minCombinationCount: number,
+        scoreGoal:number,
+        moves: number
+    ) {
         this.height = height;
         this.width = width;
         this.colorsCount = colorsCount;
         this.maxReshuffleCount = maxReshuffleCount;
         this.minCombinationCount = minCombinationCount;
+        this.scoreGoal = scoreGoal;
+        this.moves = moves;
 
         this.tiles = Utils.init2dArray(this.height, this.width, 0);
         for (let row = 0; row < this.height; row++) {
@@ -48,11 +56,19 @@ export class BlastGame {
         let combination = this.getCombination(position);
 
         if (combination.length >= this.minCombinationCount) {
+            this.moves--;
+            this.score += this.getScoreByCombinationLength(combination.length);
             this.removeTiles(combination);
             this.fallTiles();
-            this.filleEmptyTiles();            
+            this.filleEmptyTiles();
             this.tilesFallenEvent();
             this.reshuffleIfNeed();
+
+            if(this.score >= this.scoreGoal) {
+                this.gameOverEvent(GameResult.Win);
+            } else if (this.moves == 0) {
+                this.gameOverEvent(GameResult.Loose);
+            }
         }
     }
 
@@ -197,5 +213,18 @@ export class BlastGame {
         }
 
         return false;
+    }
+
+    private getScoreByCombinationLength(length: number): number {
+        switch (length) {
+            case 1:
+            case 2:
+            case 3:
+            case 4: return length * 10;
+            case 5:
+            case 6:
+            case 7: return length * 15;
+            default: return length * 20;
+        }
     }
 }

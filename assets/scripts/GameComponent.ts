@@ -1,13 +1,14 @@
-import { _decorator, Component, Node, SpriteFrame, Sprite, Prefab, Vec2, Size } from 'cc';
+import { _decorator, Component, Node, SpriteFrame, Sprite, Prefab, Vec2, Size, Label } from 'cc';
 import * as modules from 'cc';
 import { BlastGame, GameResult } from './non-components/BlastGame';
 import { Position, Utils } from "./non-components/Utils";
 import { TileComponent } from './TileComponent';
+import { GameResultComponent } from './GameResultComponent';
 
 const { ccclass, property } = _decorator;
 
-@ccclass('GameManager')
-export class GameManager extends Component {
+@ccclass('GameComponent')
+export class GameComponent extends Component {
 
     @property
     height = 8;
@@ -35,6 +36,15 @@ export class GameManager extends Component {
     @property({ type: Prefab })
     removePSPrefab: Prefab = null;
 
+    @property({ type: Label})
+    score: Label = null;
+    @property({ type: Label})
+    moves: Label = null;
+    @property({type: modules.ProgressBar})
+    progressBar: modules.ProgressBar = null;
+
+    gameResultComponent: GameResultComponent;
+
     tiles: TileComponent[][];
 
     tileSize: Size;
@@ -48,13 +58,23 @@ export class GameManager extends Component {
             this.width,
             this.colorsCount,
             this.maxReshuffleCount,
-            this.minCombinationCount);
+            this.minCombinationCount,
+            500,
+            5);
 
 
         this.bindEvents();
         this.calculateSizes();
         this.initTiles();
         this.fillTileNodes();
+
+        this.gameResultComponent = modules.find("GameResult").getComponent(GameResultComponent);
+    }
+
+    update() {
+        this.score.string = `очки:\n${this.game.score}`;
+        this.moves.string = String(this.game.moves);
+        this.progressBar.progress = this.game.score / this.game.scoreGoal;
     }
 
     private bindEvents() {
@@ -93,7 +113,8 @@ export class GameManager extends Component {
         };
 
         this.game.gameOverEvent = (result: GameResult) => {
-            modules.log("Вы проиграли!");
+            this.gameResultComponent.gameResult = result;
+            modules.director.loadScene("GameOver");
         }
     }
 
