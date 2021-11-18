@@ -5,21 +5,33 @@ export enum GameResult {
     Loose
 }
 
+export enum TileType {
+    Blue,
+    Green,
+    Purple,
+    Red,
+    Yellow,
+    Super
+}
+
 export class BlastGame {
     readonly height: number;
     readonly width: number;
     readonly colorsCount: number;
     readonly maxReshuffleCount: number;
     readonly minCombinationCount: number;
+    readonly superTileActivateThreshold: number;
+    readonly superTileRadius: number;
 
-    tiles: number[][];
+    tiles: TileType[][];
     score: number = 0;
     readonly scoreGoal: number;
-    moves: number;
+    movesCount: number;
 
     removeTileEvent: (position: Position) => void;
     fallTileEvent: (position: Position) => void;
     tilesFallenEvent: () => void;
+    superTilesAddedEvent: () => void;
     tilesSwappedEvent: () => void;
     gameOverEvent: (result: GameResult) => void;
 
@@ -29,16 +41,20 @@ export class BlastGame {
         colorsCount: number,
         maxReshuffleCount: number,
         minCombinationCount: number,
-        scoreGoal:number,
-        moves: number
+        superTileActivateThreshold: number,
+        superTileRadius: number,
+        scoreGoal: number,
+        movesCount: number
     ) {
         this.height = height;
         this.width = width;
         this.colorsCount = colorsCount;
         this.maxReshuffleCount = maxReshuffleCount;
         this.minCombinationCount = minCombinationCount;
+        this.superTileActivateThreshold = superTileActivateThreshold;
+        this.superTileRadius = superTileRadius;
         this.scoreGoal = scoreGoal;
-        this.moves = moves;
+        this.movesCount = movesCount;
 
         this.tiles = Utils.init2dArray(this.height, this.width, 0);
         for (let row = 0; row < this.height; row++) {
@@ -53,20 +69,28 @@ export class BlastGame {
     }
 
     public tapTile(position: Position) {
-        let combination = this.getCombination(position);
+        let combination;
+        if (this.tiles[position.row][position.column] == TileType.Super) {
+            combination = this.getCombinationByRadius(position, this.superTileRadius);
+        } else {
+            combination = this.getCombination(position);
+        }
 
-        if (combination.length >= this.minCombinationCount) {
-            this.moves--;
+        let currentTileIsSuper = this.tiles[position.row][position.column] == TileType.Super;
+        if (combination.length >= this.minCombinationCount || currentTileIsSuper) {
+            this.movesCount--;
             this.score += this.getScoreByCombinationLength(combination.length);
-            this.removeTiles(combination);
+            this.removeTiles(combination);            
             this.fallTiles();
-            this.filleEmptyTiles();
+            this.fillEmptyTiles();
             this.tilesFallenEvent();
+            this.tryAddSuperTile(position, combination, currentTileIsSuper);
+            this.superTilesAddedEvent();
             this.reshuffleIfNeed();
 
-            if(this.score >= this.scoreGoal) {
+            if (this.score >= this.scoreGoal) {
                 this.gameOverEvent(GameResult.Win);
-            } else if (this.moves == 0) {
+            } else if (this.movesCount == 0) {
                 this.gameOverEvent(GameResult.Loose);
             }
         }
@@ -118,7 +142,7 @@ export class BlastGame {
         });
     }
 
-    private filleEmptyTiles() {
+    private fillEmptyTiles() {
         for (let row = 0; row < this.height; row++) {
             for (let column = 0; column < this.width; column++) {
                 if (this.tiles[row][column] === null) {
@@ -198,6 +222,9 @@ export class BlastGame {
 
         for (let row = 0; row < this.height; row++) {
             for (let column = 0; column < this.width; column++) {
+                if(this.tiles[row][column] == TileType.Super) {
+                    return true;
+                }
                 if (!checkedTiles[row][column]) {
                     let combination = this.getCombination(new Position(row, column));
 
@@ -226,5 +253,34 @@ export class BlastGame {
             case 7: return length * 15;
             default: return length * 20;
         }
+    }
+
+    private tryAddSuperTile(position: Position, combination: Position[], currentTileIsSuper: boolean) {
+        if (currentTileIsSuper) return;
+        if (combination.length >= this.superTileActivateThreshold) {
+            this.tiles[position.row][position.column] = TileType.Super;
+        }
+    }
+
+    private getCombinationByRadius(position: Position, totalRadius: number): Position[] {
+        // Массив вида [1, 2, ... , this.superTileRadius, ... ,2 , 1]
+        let radiuses = Array.from({ length: totalRadius * 2 - 1 },
+            (v, k) => totalRadius - Math.abs(k + 1 - totalRadius));
+
+        let row = position.row - totalRadius + 1;
+
+        let result: Position[] = [];
+        radiuses.forEach(radius => {
+            for (let column = position.column - radius + 1; column < position.column + radius; column++) {
+                if (column >= 0 && column < this.width
+                    && row >= 0 && row < this.height
+                ) {
+                    result.push(new Position(row, column));
+                }
+            }
+            row++;
+        });
+
+        return result;
     }
 }

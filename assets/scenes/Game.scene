@@ -823,7 +823,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": 0,
-      "y": 35.876,
+      "y": -46.113,
       "z": 0
     },
     "_lrot": {
@@ -859,8 +859,8 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 40.11,
-      "height": 50.4
+      "width": 83.48,
+      "height": 49.72
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -889,13 +889,13 @@
       "b": 255,
       "a": 255
     },
-    "_string": "30",
+    "_string": "Ходов:\n20",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 30,
-    "_fontSize": 30,
+    "_actualFontSize": 20,
+    "_fontSize": 20,
     "_fontFamily": "Arial",
-    "_lineHeight": 40,
+    "_lineHeight": 22,
     "_overflow": 0,
     "_enableWrapText": true,
     "_font": {
@@ -931,7 +931,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": 0,
-      "y": -45.89,
+      "y": 34.818,
       "z": 0
     },
     "_lrot": {
@@ -967,8 +967,8 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 64.4,
-      "height": 45.2
+      "width": 78.81,
+      "height": 25.2
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -997,11 +997,11 @@
       "b": 255,
       "a": 255
     },
-    "_string": "очки:\n30",
+    "_string": "2000",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 20,
-    "_fontSize": 20,
+    "_actualFontSize": 30,
+    "_fontSize": 30,
     "_fontFamily": "Arial",
     "_lineHeight": 20,
     "_overflow": 0,
@@ -1161,8 +1161,12 @@
     "colorsCount": 5,
     "maxReshuffleCount": 5,
     "minCombinationCount": 2,
+    "superTileActivateThreshold": 5,
+    "superTileRadius": 5,
     "fieldPaddingY": 20,
     "fieldPaddingX": 20,
+    "scoreGoal": 2000,
+    "movesCount": 20,
     "field": {
       "__id__": 33
     },
@@ -1188,6 +1192,10 @@
         "__expectedType__": "cc.SpriteFrame"
       }
     ],
+    "superTileSpriteFrame": {
+      "__uuid__": "6db07d46-37f7-429f-a053-0b379a226c3a@f9941",
+      "__expectedType__": "cc.SpriteFrame"
+    },
     "tilePrefab": {
       "__uuid__": "703ad36d-2ca5-45e8-9146-5d266f5ab0c0",
       "__expectedType__": "cc.Prefab"
