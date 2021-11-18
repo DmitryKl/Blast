@@ -116,10 +116,10 @@ export class GameComponent extends Component {
             // ;
         };
 
-        this.game.superTilesAddedEvent = () => {
+        this.game.superTileAddedEvent = position => {
             modules.tween(this)
                 .delay(0.5)
-                .call(() => this.fillSuperTileNodes())
+                .call(() => this.fillSuperTileNode(position))
                 .start();
         };
 
@@ -212,20 +212,14 @@ export class GameComponent extends Component {
         return this.tileSpriteFrames[type];
     }
 
-    private fillSuperTileNodes(){
-        for (let row = 0; row < this.height; row++) {
-            for (let column = 0; column < this.width; column++) {
-                if (this.game.tiles[row][column] == TileType.Super) {
-                    this.tiles[row][column].node.destroy();
-                    this.tiles[row][column] = this.createTileNode(
-                        new Position(row, column),
-                        new Vec2(
-                            this.tileStartPoint.x + column * this.tileSize.width,
-                            this.tileStartPoint.y + row * this.tileSize.height
-                        )
-                    );
-                }
-            }
-        }
+    private fillSuperTileNode(position: Position) {
+        this.tiles[position.row][position.column].node.destroy();
+        this.tiles[position.row][position.column] = this.createTileNode(
+            new Position(position.row, position.column),
+            new Vec2(
+                this.tileStartPoint.x + position.column * this.tileSize.width,
+                this.tileStartPoint.y + position.row * this.tileSize.height
+            )
+        );
     }
 }

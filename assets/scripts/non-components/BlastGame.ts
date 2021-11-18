@@ -31,7 +31,7 @@ export class BlastGame {
     removeTileEvent: (position: Position) => void;
     fallTileEvent: (position: Position) => void;
     tilesFallenEvent: () => void;
-    superTilesAddedEvent: () => void;
+    superTileAddedEvent: (position: Position) => void;
     tilesSwappedEvent: () => void;
     gameOverEvent: (result: GameResult) => void;
 
@@ -80,12 +80,14 @@ export class BlastGame {
         if (combination.length >= this.minCombinationCount || currentTileIsSuper) {
             this.movesCount--;
             this.score += this.getScoreByCombinationLength(combination.length);
-            this.removeTiles(combination);            
+            this.removeTiles(combination);
             this.fallTiles();
             this.fillEmptyTiles();
             this.tilesFallenEvent();
-            this.tryAddSuperTile(position, combination, currentTileIsSuper);
-            this.superTilesAddedEvent();
+            let superTileAdded = this.tryAddSuperTile(position, combination, currentTileIsSuper);
+            if (superTileAdded) {
+                this.superTileAddedEvent(position);
+            }
             this.reshuffleIfNeed();
 
             if (this.score >= this.scoreGoal) {
@@ -222,7 +224,7 @@ export class BlastGame {
 
         for (let row = 0; row < this.height; row++) {
             for (let column = 0; column < this.width; column++) {
-                if(this.tiles[row][column] == TileType.Super) {
+                if (this.tiles[row][column] == TileType.Super) {
                     return true;
                 }
                 if (!checkedTiles[row][column]) {
@@ -255,11 +257,13 @@ export class BlastGame {
         }
     }
 
-    private tryAddSuperTile(position: Position, combination: Position[], currentTileIsSuper: boolean) {
-        if (currentTileIsSuper) return;
+    private tryAddSuperTile(position: Position, combination: Position[], currentTileIsSuper: boolean): boolean {
+        if (currentTileIsSuper) return false;
         if (combination.length >= this.superTileActivateThreshold) {
             this.tiles[position.row][position.column] = TileType.Super;
+            return true;
         }
+        return false;
     }
 
     private getCombinationByRadius(position: Position, totalRadius: number): Position[] {
