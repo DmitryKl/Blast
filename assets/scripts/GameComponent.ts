@@ -109,11 +109,6 @@ export class GameComponent extends Component {
 
         this.game.tilesFallenEvent = () => {
             this.fillTileNodes();
-            // modules.tween(this)
-            //     .delay(0.5)
-            //     .call(() => this.fillTileNodes())
-            //     .start();
-            // ;
         };
 
         this.game.superTileAddedEvent = position => {
@@ -140,7 +135,11 @@ export class GameComponent extends Component {
 
         this.game.gameOverEvent = (result: GameResult) => {
             this.gameResultComponent.gameResult = result;
-            modules.director.loadScene("GameOver");
+            modules.tween(this)                
+                .delay(0.5)
+                .call(() => modules.director.loadScene("GameOver"))
+                .start();
+            ;
         }
     }
 
