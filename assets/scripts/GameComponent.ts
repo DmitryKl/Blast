@@ -78,9 +78,11 @@ export class GameComponent extends Component {
         this.bindEvents();
         this.calculateSizes();
         this.initTiles();
-        this.fillTileNodes();
+        this.fillTileNodes();        
 
         this.gameResultComponent = modules.find("GameResult").getComponent(GameResultComponent);
+
+        this.game.reshuffleIfNeed();
     }
 
     update() {

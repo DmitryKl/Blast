@@ -1162,7 +1162,7 @@
     "maxReshuffleCount": 5,
     "minCombinationCount": 2,
     "superTileActivateThreshold": 5,
-    "superTileRadius": 5,
+    "superTileRadius": 4,
     "fieldPaddingY": 20,
     "fieldPaddingX": 20,
     "scoreGoal": 2000,
@@ -1345,12 +1345,12 @@
     "_offset": {
       "__type__": "cc.Vec2",
       "x": 0,
-      "y": -200
+      "y": -220
     },
     "_size": {
       "__type__": "cc.Size",
       "width": 800,
-      "height": 1
+      "height": 40
     },
     "_id": "cc9NDLfqtOtKkKWePOrigS"
   },

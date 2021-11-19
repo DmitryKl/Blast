@@ -69,12 +69,7 @@ export class BlastGame {
     }
 
     public tapTile(position: Position) {
-        let combination;
-        if (this.tiles[position.row][position.column] == TileType.Super) {
-            combination = this.getCombinationByRadius(position, this.superTileRadius);
-        } else {
-            combination = this.getCombination(position);
-        }
+        let combination = this.getCombination(position);        
 
         let currentTileIsSuper = this.tiles[position.row][position.column] == TileType.Super;
         if (combination.length >= this.minCombinationCount || currentTileIsSuper) {
@@ -98,7 +93,32 @@ export class BlastGame {
         }
     }
 
-    private getCombination(start: Position): Position[] {
+    private getCombination(startPosition: Position, tmpResult: Position[] = []): Position[] {
+        let result: Position[] = [];
+
+        switch(this.tiles[startPosition.row][startPosition.column]) {
+            case TileType.Super:
+                result = this.getCombinationByRadius(startPosition, this.superTileRadius);
+                break;
+            default:
+                result = this.getCombinationSimple(startPosition);
+        }
+
+        result.forEach(position => {            
+            // Если в комбинацию попадает супер-плитка - запускаем из нее комбинацию
+            // кроме случаев, когда нажали на эту клетку или она уже была собрана.
+            if(this.tiles[position.row][position.column] == TileType.Super
+                && !position.equal(startPosition)
+                && !Utils.arrayContainsValue(tmpResult, position)
+            ) {
+                result = Utils.mergeArraysWithoutDuplicates(result, this.getCombination(position, result));
+            }                  
+        });
+
+        return result;
+    }
+
+    private getCombinationSimple(start: Position): Position[] {
         let result: Position[] = [];
 
         let stack: Position[] = [];
@@ -120,11 +140,7 @@ export class BlastGame {
             shifts.forEach(shift => {
                 let newPosition = position.addPosition(shift);
 
-                if (newPosition != null
-                    && newPosition.row >= 0
-                    && newPosition.row < this.height
-                    && newPosition.column >= 0
-                    && newPosition.column < this.width
+                if (this.positionInField(newPosition)
                     && !used[newPosition.row][newPosition.column]
                     && this.tiles[position.row][position.column] == this.tiles[newPosition.row][newPosition.column]
                 ) {
@@ -176,7 +192,7 @@ export class BlastGame {
         this.fallTileEvent(tile);
     }
 
-    private reshuffleIfNeed() {
+    public reshuffleIfNeed() {
         let reshuffleIteration = 0;
         let moveExists = this.moveExists();
 
@@ -228,7 +244,7 @@ export class BlastGame {
                     return true;
                 }
                 if (!checkedTiles[row][column]) {
-                    let combination = this.getCombination(new Position(row, column));
+                    let combination = this.getCombinationSimple(new Position(row, column));
 
                     if (combination.length >= this.minCombinationCount) {
                         return true;
@@ -266,25 +282,30 @@ export class BlastGame {
         return false;
     }
 
-    private getCombinationByRadius(position: Position, totalRadius: number): Position[] {
+    private getCombinationByRadius(position: Position, totalRadius: number, tmpResult: Position[] = []): Position[] {
+        let result: Position[] = [];
+
         // Массив вида [1, 2, ... , this.superTileRadius, ... ,2 , 1]
         let radiuses = Array.from({ length: totalRadius * 2 - 1 },
             (v, k) => totalRadius - Math.abs(k + 1 - totalRadius));
 
         let row = position.row - totalRadius + 1;
-
-        let result: Position[] = [];
-        radiuses.forEach(radius => {
+        for (let i = 0; i < radiuses.length; i++) {
+            const radius = radiuses[i];
             for (let column = position.column - radius + 1; column < position.column + radius; column++) {
-                if (column >= 0 && column < this.width
-                    && row >= 0 && row < this.height
-                ) {
-                    result.push(new Position(row, column));
+                let currentPosition = new Position(row, column);
+                if (this.positionInField(currentPosition)) {
+                    result.push(currentPosition);                
                 }
             }
             row++;
-        });
+        }
 
         return result;
+    }
+
+    protected positionInField(position: Position) {
+        return position.column >= 0 && position.column < this.width
+            && position.row >= 0 && position.row < this.height;
     }
 }
